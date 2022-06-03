@@ -16,7 +16,10 @@ class GripperEnv(gym.Env):
             low=np.array([0, 0], dtype=np.float32),
             high=np.array([1, 1], dtype=np.float32)
         )
-        self.observation_space = gym.spaces.Box(0, 2 * math.pi)
+        self.observation_space = gym.spaces.box.Box(
+            low=0,
+            high=2 * math.pi,
+            shape=(1, 1))
         self.np_random, _ = gym.utils.seeding.np_random()
 
         self.client = p.connect(p.DIRECT)
@@ -39,9 +42,11 @@ class GripperEnv(gym.Env):
     def reset(self):
         p.resetSimulation(self.client)
         p.setGravity(0, 0, -10)
+        initial_position = [1.0, 2.0]
         self.done = False
 
-        self.gripper = Gripper(client=self.client)
+        self.gripper = Gripper(client=self.client,
+                               initial_position=initial_position)
         self.ball = Ball(client=self.client)
         self.goal = self.np_random.uniform(0, 2 * math.pi)
 
