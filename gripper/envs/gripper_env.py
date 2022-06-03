@@ -16,10 +16,11 @@ class GripperEnv(gym.Env):
             low=np.array([0, 0], dtype=np.float32),
             high=np.array([1, 1], dtype=np.float32)
         )
-        self.observation_space = gym.spaces.box.Box(
+        self.observation_space = gym.spaces.Box(
             low=0,
             high=2 * math.pi,
-            shape=(1, 1))
+            shape=(1, )
+        )
         self.np_random, _ = gym.utils.seeding.np_random()
 
         self.client = p.connect(p.DIRECT)
@@ -30,11 +31,17 @@ class GripperEnv(gym.Env):
         self.done = False
         self.goal = None
 
+        self.reward_coeff = 1
+
         self.reset()
 
     def step(self, action):
-        ob = 1
-        reward = 1
+        self.gripper.apply_action(action)
+        p.stepSimulation()
+        ob = self.gripper.get_observation()
+
+        reward = -self.reward_coeff * (self.goal - ob) ** 2
+
         self.done = True
 
         return ob, reward, self.done, dict()
@@ -50,7 +57,7 @@ class GripperEnv(gym.Env):
         self.ball = Ball(client=self.client)
         self.goal = self.np_random.uniform(0, 2 * math.pi)
 
-        return np.array([])
+        return np.array(0)
 
     def close(self):
         p.disconnect(self.client)

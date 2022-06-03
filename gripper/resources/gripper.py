@@ -6,7 +6,7 @@ import math
 class Gripper:
     def __init__(self, client, initial_position):
         self.client = client
-        f_name = os.path.join(os.path.dirname(__file__), 'gripper_model.urdf')
+        f_name = './gripper/resources/gripper_model.urdf'
         self.gripper = p.loadURDF(fileName=f_name,
                                   basePosition=[0, 0, 0.1],
                                   physicsClientId=client)
@@ -22,4 +22,4 @@ class Gripper:
 
     def get_observation(self):
         pos, ang = p.getBasePositionAndOrientation(self.gripper, self.client)
-        return ang
+        return 1.0
