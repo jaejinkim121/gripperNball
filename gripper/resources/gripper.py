@@ -20,3 +20,6 @@ class Gripper:
                                     targetPositions=[p_command_left, p_command_right],
                                     physicsClientId=self.client)
 
+    def get_observation(self):
+        pos, ang = p.getBasePositionAndOrientation(self.gripper, self.client)
+        return ang
