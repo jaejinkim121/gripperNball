@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<robot name="modelt">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.0785" radius="0.05"/>
+      </geometry>
+      <material name="white">
+        <color rgba="1 1 1 0.8"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.0785" radius="0.05"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="finger1_prox">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.03"/>
+      <inertia ixx="145E-8" ixy="0" ixz="0" iyy="113725E-10" iyz="0" izz="112025E-10"/>
+    </inertial>
+    <visual>
+      <geometry>
+	      <mesh filename="package://ohp_model_t_model/meshes/finger_prox.STL"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 0.8"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ohp_model_t_model/meshes/finger_prox.STL"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_to_finger1" type="revolute">
+    <axis xyz="0 -1 0"/>
+    <limit effort="1000.0" lower="0.0" upper="2.35619" velocity="0.5"/>
+    <origin rpy="0 0 0" xyz="0.01453 0 0.05475"/>
+    <parent link ="base_link"/>
+    <child link="finger1_prox"/>
+  </joint>
+
+  <link name="finger1_dist">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.02"/>
+      <inertia ixx="145E-8" ixy="0" ixz="0" iyy="6450625E-12" iyz="0" izz="6280625E-12"/>
+    </inertial>
+    <visual>
+      <geometry>
+	      <mesh filename="package://ohp_model_t_model/meshes/finger_dist.STL"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 0.8"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ohp_model_t_model/meshes/finger_dist.STL"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="prox_to_dist1" type="revolute">
+    <axis xyz="0 -1 0"/>
+    <limit effort="1000.0" lower="0.314159" upper="1.885" velocity="0.5"/>
+    <origin rpy="0 0 0" xyz="0.061 0 0.004"/>
+    <parent link ="finger1_prox"/>
+    <child link="finger1_dist"/>
+  </joint>
+
+  <link name="finger3_prox">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.03"/>
+      <inertia ixx="145E-8" ixy="0" ixz="0" iyy="113725E-10" iyz="0" izz="112025E-10"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://ohp_model_t_model/meshes/finger_prox.STL"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ohp_model_t_model/meshes/finger_prox.STL"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_to_finger3" type="revolute">
+    <axis xyz="0 -1 0"/>
+    <limit effort="1000.0" lower="0.0" upper="2.35619" velocity="0.5"/>
+    <origin rpy="0 0 3.14159" xyz="-0.01453 0 0.05475"/>
+    <parent link ="base_link"/>
+    <child link="finger3_prox"/>
+  </joint>
+
+  <link name="finger3_dist">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.02"/>
+      <inertia ixx="145E-8" ixy="0" ixz="0" iyy="6450625E-12" iyz="0" izz="6280625E-12"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="package://ohp_model_t_model/meshes/finger_dist.STL"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 1 0.8"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://ohp_model_t_model/meshes/finger_dist.STL"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="prox_to_dist3" type="revolute">
+    <axis xyz="0 -1 0"/>
+    <limit effort="1000.0" lower="0.314159" upper="1.885" velocity="0.5"/>
+    <origin rpy="0 0 0" xyz="0.061 0 0.004"/>
+    <parent link ="finger3_prox"/>
+    <child link="finger3_dist"/>
+  </joint>
+</robot>
