@@ -42,7 +42,9 @@ class GripperEnv(gym.Env):
 
         reward = -self.reward_coeff * (self.goal - ob) ** 2
 
-        self.done = True
+        # Early Ending Condition Setup
+        if reward > -1E-6:
+            self.done = True
 
         return ob, reward, self.done, dict()
 
