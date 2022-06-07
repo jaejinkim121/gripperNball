@@ -2,9 +2,12 @@ import gym
 import numpy as np
 import math
 import pybullet as p
+import pybullet_data
 import matplotlib.pyplot as plt
 from gripper.resources.gripper import Gripper
 from gripper.resources.ball import Ball
+from ..resources.common import Config
+from ..resources import common
 
 
 class GripperEnv(gym.Env):
@@ -28,6 +31,7 @@ class GripperEnv(gym.Env):
 
         self.gripper = None
         self.ball = None
+        self.plane = None
         self.done = False
         self.goal = None
 
@@ -50,13 +54,15 @@ class GripperEnv(gym.Env):
 
     def reset(self):
         p.resetSimulation(self.client)
-        p.setGravity(0, 0, -10)
+        p.setAdditionalSearchPath(pybullet_data.getDataPath())
+        p.setPhysicsEngineParameter(numSolverIterations=Config.NUM_ITER)
         initial_position = [1.0, 2.0]
         self.done = False
 
         self.gripper = Gripper(client=self.client,
                                initial_position=initial_position)
         self.ball = Ball(client=self.client)
+        self.plane = p.loadURDF("plane.urdf")
         self.goal = self.np_random.uniform(0, 2 * math.pi)
 
         return np.array(0)
