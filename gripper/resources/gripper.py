@@ -6,7 +6,7 @@ import math
 class Gripper:
     def __init__(self, client, initial_position):
         self.client = client
-        f_name = './gripper/resources/gripper_model.urdf'
+        f_name = './gripper/resources/ohp_model_t_model/urdf/model_t.urdf'
         self.gripper = p.loadURDF(fileName=f_name,
                                   basePosition=[0, 0, 0.1],
                                   physicsClientId=client)
