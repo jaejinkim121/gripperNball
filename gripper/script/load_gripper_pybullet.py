@@ -29,6 +29,7 @@ GRIPPER_GEAR_RATIO = 0.7  # synergistic movement ratio at free motion
 client = p.connect(p.GUI)
 p.resetSimulation()
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
+
 p.resetDebugVisualizerCamera(cameraDistance=0.2,
                              cameraYaw=0,
                              cameraPitch=0,
