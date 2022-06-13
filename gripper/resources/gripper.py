@@ -21,12 +21,6 @@ class Gripper:
         self.input_joints = [0, 2]
         self.initial_pos = initial_position
 
-        # Get Joint Info
-        for i in range(self.nJoints):
-            self.jointInfo = p.getJointInfo(self.gripper, i)
-            self.jointNameToID[self.jointInfo[1].decode('UTF-8')] = self.jointInfo[0]
-            print('joint num {}: {}'.format(self.jointInfo[0], self.jointInfo[1]))
-
         # set contact parameters
         for i in range(self.nJoints):
             p.changeDynamics(self.gripper, i, lateralFriction=Config.MU)
@@ -35,7 +29,6 @@ class Gripper:
                              contactStiffness=common.cal_Kc(self.gripper, i, Config.B_GRIPPER),
                              contactDamping=Config.B_GRIPPER)
         self.reset_joint_pos()
-
 
     # Action : 2 target joint angle command.
     def apply_action(self, action):

@@ -40,6 +40,6 @@ class Ball:
     # Get object orientation only
     def get_observation(self):
         obj_state = p.getBasePositionAndOrientation(self.ball)
-        joint_angle = 2 * math.acos(obj_state[1][3])
-
-        return [joint_angle]
+        joint_angle = 2 * math.atan2(obj_state[1][1], obj_state[1][3])
+        object_height = obj_state[0][2]
+        return [object_height, joint_angle]
