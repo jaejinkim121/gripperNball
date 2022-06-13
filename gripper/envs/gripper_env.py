@@ -86,7 +86,7 @@ class GripperEnv(gym.Env):
         # Penalty for object lost
         if (ob_ball[0] > 0.17) or (ob_ball[0] < 0.08):
             self.done = True
-            reward += self.reward_coeff[2]
+            reward = self.reward_coeff[2]
             print("END Condition - Object Out of range")
 
         if reward > -1E-6:
