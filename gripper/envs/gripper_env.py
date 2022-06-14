@@ -32,7 +32,11 @@ class GripperEnv(gym.Env):
         )
         self.np_random, _ = gym.utils.seeding.np_random()
 
-        self.client = p.connect(p.DIRECT)
+        if Config.IS_GUI:
+            self.client = p.connect(p.GUI)
+        else:
+            self.client = p.connect(p.DIRECT)
+
         p.resetDebugVisualizerCamera(cameraDistance=0.2,
                                      cameraYaw=0,
                                      cameraPitch=0,
@@ -40,6 +44,8 @@ class GripperEnv(gym.Env):
         p.setTimeStep(1/200, self.client)
 
         self.current_input = [Config.INIT_POSE, Config.INIT_POSE]
+        self.current_step = 0
+
         self.gripper = None
         self.ball = None
         self.plane = None
@@ -49,19 +55,32 @@ class GripperEnv(gym.Env):
         self.reward_coeff = [Config.REWARD_ACHIEVE_GOAL,
                              Config.PENALTY_GOAL_DIST,
                              Config.PENALTY_LOST_OBJECT,
-                             Config.PENALTY_OVER_GRASPING]
-
+                             Config.PENALTY_OVER_GRASPING,
+                             Config.PENALTY_OVER_GRASPING_HARD]
         self.reset()
 
     def step(self, action):
-        action[0] = action[0] + self.current_input[0]
-        action[1] = action[1] + self.current_input[1]
+        self.current_step += 1
+        object_lost = False
+
+        if self.current_step == Config.MAX_STEP_SINGLE_EPISODE:
+            self.done = True
+
+        action[0] = max(min(action[0] + self.current_input[0], TPI), 0)
+        action[1] = max(min(action[1] + self.current_input[1], TPI), 0)
+        self.current_input[0] = action[0]
+        self.current_input[1] = action[1]
         self.gripper.apply_action(action)
         p.stepSimulation()
         ob_gripper = self.gripper.get_observation()
         ob_ball = self.ball.get_observation()
-        ob_contact_force = \
+        contact_force = \
             [common.contact_force_link(
+                self.gripper.gripper,
+                self.ball.ball,
+                0
+            ),
+            common.contact_force_link(
                 self.gripper.gripper,
                 self.ball.ball,
                 1
@@ -69,8 +88,15 @@ class GripperEnv(gym.Env):
             common.contact_force_link(
                 self.gripper.gripper,
                 self.ball.ball,
+                2
+            ),
+            common.contact_force_link(
+                self.gripper.gripper,
+                self.ball.ball,
                 3
             )]
+
+        ob_contact_force = [contact_force[1], contact_force[3]]
 
         ob = ob_gripper + ob_contact_force + ob_ball
 
@@ -86,17 +112,31 @@ class GripperEnv(gym.Env):
         # Penalty for object lost
         if (ob_ball[0] > 0.17) or (ob_ball[0] < 0.08):
             self.done = True
+            object_lost = True
+
+        if (contact_force[0] != 0 and contact_force[1] == 0)\
+                or (contact_force[2] != 0 and contact_force[3] == 0):
+            self.done = True
+            object_lost = True
+
+        if max(contact_force) > Config.HARD_MAX_FORCE:
+            self.done = True
+            #print("END Condition - Too high contact force")
+            reward = self.reward_coeff[4]
+
+        if object_lost:
+            #print("END Condition - Object Out of range")
             reward = self.reward_coeff[2]
-            print("END Condition - Object Out of range")
 
         if reward > -1E-6:
             self.done = True
             reward = self.reward_coeff[0]
-            print("END Condition - Objective Clear")
+            #print("END Condition - Objective Clear")
 
         return ob, reward, self.done, dict()
 
     def reset(self):
+        self.current_step = 0
         self.contact = False
         p.resetSimulation(self.client)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
@@ -106,6 +146,9 @@ class GripperEnv(gym.Env):
         self.ball = Ball(client=self.client)
         self.gripper = Gripper(client=self.client,
                                initial_position=Config.INIT_POSE)
+
+        self.current_input = [Config.INIT_POSE, Config.INIT_POSE]
+
         self.goal = self.np_random.uniform(-math.pi * Config.GOAL_MAX,
                                            math.pi * Config.GOAL_MAX)
         ob_gripper = self.gripper.get_observation()

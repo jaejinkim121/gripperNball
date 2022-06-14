@@ -37,7 +37,7 @@ class Gripper:
         return
 
     def pos_input(self, joint_id, desired_pos):
-        if desired_pos < 0 :
+        if desired_pos < 0:
             desired_pos = 0
         p.setJointMotorControl2(self.gripper,
                                 joint_id,

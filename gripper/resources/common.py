@@ -4,9 +4,10 @@ import pybullet as p
 class Config:
     # parameters
     NUM_ITER = 1000
-
+    IS_GUI = False
     STABLE_MIN_FORCE = 1
-    STABLE_MAX_FORCE = 20
+    STABLE_MAX_FORCE = 7
+    HARD_MAX_FORCE = 15
 
     MU = 1
     B_GRIPPER = 10.
@@ -16,12 +17,13 @@ class Config:
     # Reward or Penalty Definition
     REWARD_ACHIEVE_GOAL = 50
     PENALTY_GOAL_DIST = -1
-    PENALTY_LOST_OBJECT = -50
-    PENALTY_OVER_GRASPING = -1
+    PENALTY_LOST_OBJECT = -100
+    PENALTY_OVER_GRASPING = -10
+    PENALTY_OVER_GRASPING_HARD = -100
 
-    GOAL_MAX = 0.5
+    GOAL_MAX = 0.8
     INIT_POSE = 1.2  # gripper initial pose
-    Input_perturbation = 0.15
+    Input_perturbation = 0.001
     OBJECT_HEIGHT = 0.13
     OBJECT_SCALE = 0.7
     OBJECT_PERTURBATION = 0.01
@@ -33,7 +35,8 @@ class Config:
     # Learning Parameters
     N_EPOCHS = 20
     BATCH_SIZE = 256
-    TOTAL_TIMESTEPS = 250_000
+    TOTAL_TIMESTEPS = 10_000_000
+    MAX_STEP_SINGLE_EPISODE = 10000
 
 
 # calculate contact stiffness
