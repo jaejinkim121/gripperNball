@@ -1,20 +1,41 @@
 import pybullet as p
 import os
+import sys
 import math
 from gripper.resources.common import Config
 from gripper.resources import common
+from contextlib import contextmanager
 import numpy as np
 
+@contextmanager
+def suppress_stdout():
+    fd = sys.stdout.fileno()
+
+    def _redirect_stdout(to):
+        sys.stdout.close()  # + implicit flush()
+        os.dup2(to.fileno(), fd)  # fd writes to 'to' file
+        sys.stdout = os.fdopen(fd, "w")  # Python writes to fd
+
+    with os.fdopen(os.dup(fd), "w") as old_stdout:
+        with open(os.devnull, "w") as file:
+            _redirect_stdout(to=file)
+        try:
+            yield  # allow code to be run with the redirected stdout
+        finally:
+            _redirect_stdout(to=old_stdout)  # restore stdout.
+            # buffering and flags such as
+            # CLOEXEC may be different
 
 class Gripper:
     def __init__(self, client, initial_position):
         self.client = client
         f_name = './gripper/resources/ohp_model_t_model/urdf/model_t_mesh.urdf'
-        self.gripper = p.loadURDF(
-            fileName=f_name,
-            baseOrientation=p.getQuaternionFromEuler([0, 0, 3.14]),
-            useFixedBase=True,
-            physicsClientId=client)
+        with suppress_stdout():
+            self.gripper = p.loadURDF(
+                fileName=f_name,
+                baseOrientation=p.getQuaternionFromEuler([0, 0, 3.14]),
+                useFixedBase=True,
+                physicsClientId=client)
 
         self.nJoints = p.getNumJoints(self.gripper)
         self.jointNameToID = {}
