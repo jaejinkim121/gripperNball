@@ -11,6 +11,7 @@ from gripper.resources import common
 
 TPI = 2 * math.pi
 
+
 class GripperEnv(gym.Env):
     metadata = {'render.modes': ['human', 'rgb_array'],
                 'video.frames_per_second': 50}
@@ -45,6 +46,7 @@ class GripperEnv(gym.Env):
 
         self.current_input = [Config.INIT_POSE, Config.INIT_POSE]
         self.current_step = 0
+        self.total_step = 0
 
         self.gripper = None
         self.ball = None
@@ -80,17 +82,17 @@ class GripperEnv(gym.Env):
                 self.ball.ball,
                 0
             ),
-            common.contact_force_link(
+                common.contact_force_link(
                 self.gripper.gripper,
                 self.ball.ball,
                 1
             ),
-            common.contact_force_link(
+                common.contact_force_link(
                 self.gripper.gripper,
                 self.ball.ball,
                 2
             ),
-            common.contact_force_link(
+                common.contact_force_link(
                 self.gripper.gripper,
                 self.ball.ball,
                 3
@@ -105,9 +107,11 @@ class GripperEnv(gym.Env):
 
         # Penalty for over-grasping
         if ob_contact_force[0] > Config.STABLE_MAX_FORCE:
-            reward += self.reward_coeff[3] * (ob_contact_force[0] - Config.STABLE_MAX_FORCE)
+            reward += self.reward_coeff[3] * \
+                (ob_contact_force[0] - Config.STABLE_MAX_FORCE)
         if ob_contact_force[1] > Config.STABLE_MAX_FORCE:
-            reward += self.reward_coeff[3] * (ob_contact_force[1] - Config.STABLE_MAX_FORCE)
+            reward += self.reward_coeff[3] * \
+                (ob_contact_force[1] - Config.STABLE_MAX_FORCE)
 
         # Penalty for object lost
         if (ob_ball[0] > 0.17) or (ob_ball[0] < 0.08):
@@ -136,6 +140,7 @@ class GripperEnv(gym.Env):
         return ob, reward, self.done, dict()
 
     def reset(self):
+        self.total_step = self.total_step+self.current_step
         self.current_step = 0
         self.contact = False
         p.resetSimulation(self.client)
@@ -164,9 +169,10 @@ class GripperEnv(gym.Env):
                     self.gripper.gripper,
                     self.ball.ball,
                     3
-                )]
+            )]
         ob = ob_gripper + ob_contact_force + ob_ball
-        print("Current trial's goal = {}, Currnet ball angle = {}".format(self.goal, ob[-1]))
+        print("[{}/{}]: Current trial's goal = {}, Currnet ball angle = {}".format(
+            self.total_step, Config.TOTAL_TIMESTEPS,self.goal, ob[-1]), end="\r")
         return ob
 
     def close(self):
