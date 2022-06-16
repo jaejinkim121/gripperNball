@@ -23,8 +23,8 @@ class Config:
 
     GOAL_MAX = 0.8
     INIT_POSE = 1.2  # gripper initial pose
-    Input_perturbation = 0.001
-    OBJECT_HEIGHT = 0.13
+    Input_perturbation = 0.002
+    OBJECT_HEIGHT = 0.135
     OBJECT_SCALE = 0.7
     OBJECT_PERTURBATION = 0.01
 
@@ -36,7 +36,7 @@ class Config:
     N_EPOCHS = 20
     BATCH_SIZE = 256
     TOTAL_TIMESTEPS = 10_000_000
-    MAX_STEP_SINGLE_EPISODE = 10000
+    MAX_STEP_SINGLE_EPISODE = 100000
 
 
 # calculate contact stiffness

@@ -121,17 +121,17 @@ class GripperEnv(gym.Env):
 
         if max(contact_force) > Config.HARD_MAX_FORCE:
             self.done = True
-            #print("END Condition - Too high contact force")
+            print("END Condition - Too high contact force")
             reward = self.reward_coeff[4]
 
         if object_lost:
-            #print("END Condition - Object Out of range")
+            print("END Condition - Object Out of range")
             reward = self.reward_coeff[2]
 
         if reward > -1E-6:
             self.done = True
             reward = self.reward_coeff[0]
-            #print("END Condition - Objective Clear")
+            print("END Condition - Objective Clear")
 
         return ob, reward, self.done, dict()
 
