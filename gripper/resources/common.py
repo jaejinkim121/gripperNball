@@ -4,7 +4,7 @@ import pybullet as p
 class Config:
     # parameters
     NUM_ITER = 1000
-    IS_GUI = True
+    IS_GUI = False
     STABLE_MIN_FORCE = 1
     STABLE_MAX_FORCE = 7
     HARD_MAX_FORCE = 15
@@ -35,7 +35,7 @@ class Config:
     # Learning Parameters
     N_EPOCHS = 20
     BATCH_SIZE = 256
-    TOTAL_TIMESTEPS = 1_000_000
+    TOTAL_TIMESTEPS = 10_000_000
     MAX_STEP_SINGLE_EPISODE = 10000
 
 

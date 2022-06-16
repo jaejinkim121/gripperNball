@@ -118,20 +118,10 @@ class GripperEnv(gym.Env):
             self.done = True
             object_lost = True
 
-        if (contact_force[1] == 0 and contact_force[3] == 0):
-            if (contact_force[0] != 0 and contact_force[2] != 0):
-                self.done = True
-                object_lost = True
-
-        # if (contact_force[0] != 0 and contact_force[1] == 0)\
-        #         or (contact_force[2] != 0 and contact_force[3] == 0):
-        #     self.done = True
-        #     object_lost = True
-
         # youngseon lee edited
-        # if (contact_force[1] == 0 or contact_force[3] == 0):
-        #     self.done = True
-        #     object_lost = True
+        if (contact_force[1] == 0 or contact_force[3] == 0):
+            self.done = True
+            object_lost = True
 
         if max(contact_force) > Config.HARD_MAX_FORCE:
             self.done = True
