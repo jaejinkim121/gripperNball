@@ -4,7 +4,7 @@ import pybullet as p
 class Config:
     # parameters
     NUM_ITER = 1000
-    IS_GUI = False
+    IS_GUI = True
     STABLE_MIN_FORCE = 1
     STABLE_MAX_FORCE = 7
     HARD_MAX_FORCE = 15
@@ -23,9 +23,9 @@ class Config:
 
     GOAL_MAX = 0.8
     INIT_POSE = 1.2  # gripper initial pose
-    Input_perturbation = 0.002
-    OBJECT_HEIGHT = 0.135
-    OBJECT_SCALE = 0.7
+    Input_perturbation = 0.001
+    OBJECT_HEIGHT = 0.11
+    OBJECT_SCALE = 0.6
     OBJECT_PERTURBATION = 0.01
 
     CONSTRAINT_ERP = 0.00001
@@ -35,8 +35,8 @@ class Config:
     # Learning Parameters
     N_EPOCHS = 20
     BATCH_SIZE = 256
-    TOTAL_TIMESTEPS = 10_000_000
-    MAX_STEP_SINGLE_EPISODE = 100000
+    TOTAL_TIMESTEPS = 1_000_000
+    MAX_STEP_SINGLE_EPISODE = 10000
 
 
 # calculate contact stiffness

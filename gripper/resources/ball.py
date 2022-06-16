@@ -10,14 +10,15 @@ import random
 class Ball:
     def __init__(self, client):
         self.client = client
-        f_name = './gripper/resources/sphere_small.urdf'
+        f_name = './gripper/resources/duck_vhacd.urdf'
         self.ball = \
             p.loadURDF(fileName=f_name,
                        basePosition=[
-                           (0.5 - random.random())*Config.OBJECT_PERTURBATION,
+                           (0.5 - random.random())*Config.OBJECT_PERTURBATION + 0.01,
                            0,
                            Config.OBJECT_HEIGHT
                        ],
+                       baseOrientation=p.getQuaternionFromEuler([1.57, 0, 0]),
                        globalScaling=Config.OBJECT_SCALE,
                        physicsClientId=client)
         p.changeDynamics(self.ball, -1, mass=Config.M_OBJECT)
@@ -42,4 +43,6 @@ class Ball:
         obj_state = p.getBasePositionAndOrientation(self.ball)
         joint_angle = 2 * math.atan2(obj_state[1][1], obj_state[1][3])
         object_height = obj_state[0][2]
+        #return [object_height, joint_angle]
+        # object_x = obj_state[0][0]
         return [object_height, joint_angle]
