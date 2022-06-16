@@ -40,11 +40,12 @@ class GripperEnv(gym.Env):
         p.resetDebugVisualizerCamera(cameraDistance=0.2,
                                      cameraYaw=0,
                                      cameraPitch=0,
-                                     cameraTargetPosition=[0.0, -0.15, 0.1])
+                                     cameraTargetPosition=[0, -0.15, 0.1])
         p.setTimeStep(1/200, self.client)
 
         self.current_input = [Config.INIT_POSE, Config.INIT_POSE]
         self.current_step = 0
+        self.total_step = 0
 
         self.gripper = None
         self.ball = None
@@ -101,7 +102,7 @@ class GripperEnv(gym.Env):
         ob = ob_gripper + ob_contact_force + ob_ball
 
         # Penalty for target orientation difference
-        reward = self.reward_coeff[1] * abs(self.goal - ob[-1])
+        reward = self.reward_coeff[1] * abs(self.goal - ob_ball[1])
 
         # Penalty for over-grasping
         if ob_contact_force[0] > Config.STABLE_MAX_FORCE:
@@ -110,14 +111,24 @@ class GripperEnv(gym.Env):
             reward += self.reward_coeff[3] * (ob_contact_force[1] - Config.STABLE_MAX_FORCE)
 
         # Penalty for object lost
-        if (ob_ball[0] > 0.17) or (ob_ball[0] < 0.08):
+        if (ob_ball[0] > 0.2) or (ob_ball[0] < 0.08):
             self.done = True
             object_lost = True
 
-        if (contact_force[0] != 0 and contact_force[1] == 0)\
-                or (contact_force[2] != 0 and contact_force[3] == 0):
-            self.done = True
-            object_lost = True
+        if (contact_force[1] == 0 and contact_force[3] == 0):
+            if (contact_force[0] != 0 and contact_force[2] != 0):
+                self.done = True
+                object_lost = True
+
+        # if (contact_force[0] != 0 and contact_force[1] == 0)\
+        #         or (contact_force[2] != 0 and contact_force[3] == 0):
+        #     self.done = True
+        #     object_lost = True
+
+        # youngseon lee edited
+        # if (contact_force[1] == 0 or contact_force[3] == 0):
+        #     self.done = True
+        #     object_lost = True
 
         if max(contact_force) > Config.HARD_MAX_FORCE:
             self.done = True
@@ -136,6 +147,7 @@ class GripperEnv(gym.Env):
         return ob, reward, self.done, dict()
 
     def reset(self):
+        self.total_step = self.total_step+self.current_step
         self.current_step = 0
         self.contact = False
         p.resetSimulation(self.client)
@@ -149,10 +161,13 @@ class GripperEnv(gym.Env):
 
         self.current_input = [Config.INIT_POSE, Config.INIT_POSE]
 
-        self.goal = self.np_random.uniform(-math.pi * Config.GOAL_MAX,
-                                           math.pi * Config.GOAL_MAX)
+        # self.goal = self.np_random.uniform(-math.pi * Config.GOAL_MAX,
+        #                                    math.pi * Config.GOAL_MAX)
+        
+
         ob_gripper = self.gripper.get_observation()
         ob_ball = self.ball.get_observation()
+        self.goal = -math.pi/10
         ob_contact_force = \
             [common.contact_force_link(
                 self.gripper.gripper,
@@ -166,7 +181,9 @@ class GripperEnv(gym.Env):
                     3
                 )]
         ob = ob_gripper + ob_contact_force + ob_ball
-        print("Current trial's goal = {}, Currnet ball angle = {}".format(self.goal, ob[-1]))
+        # print("Current trial's goal = {}, Currnet ball pos = {}".format(self.goal, ob_ball[0]))
+        print("[{}/{}]: Current trial's goal = {}, Current ball ori = {}".format(
+            self.total_step, Config.TOTAL_TIMESTEPS,self.goal, ob_ball[1]), end="\r")
         return ob
 
     def close(self):
